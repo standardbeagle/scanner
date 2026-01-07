@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- MVVM Toolkit -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+
+    <!-- Dependency Injection -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.*" />
+
+    <!-- Image Processing -->
+    <PackageReference Include="OpenCvSharp4" Version="4.*" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.*" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.*" />
+
+    <!-- OCR -->
+    <PackageReference Include="Tesseract" Version="5.*" />
+
+    <!-- PDF Generation -->
+    <PackageReference Include="PDFsharp" Version="6.*" />
+
+    <!-- Cloud Integration -->
+    <PackageReference Include="Microsoft.Graph" Version="5.*" />
+    <PackageReference Include="Azure.Identity" Version="1.*" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.*" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.*" />
+  </ItemGroup>
+
+
+</Project>

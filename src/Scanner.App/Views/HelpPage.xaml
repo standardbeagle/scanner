@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Scanner.App.Views.HelpPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Scanner.App.Views">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="24" MaxWidth="800" HorizontalAlignment="Left">
+
+            <TextBlock Text="Help &amp; Tips" Style="{StaticResource PageTitleStyle}" />
+
+            <!-- Quick Start -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Quick Start" Style="{StaticResource SectionTitleStyle}" />
+
+                    <StackPanel Spacing="12">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                    CornerRadius="20" Width="32" Height="32">
+                                <TextBlock Text="1" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" Foreground="White" />
+                            </Border>
+                            <TextBlock Text="Connect your scanner to your computer"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                    CornerRadius="20" Width="32" Height="32">
+                                <TextBlock Text="2" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" Foreground="White" />
+                            </Border>
+                            <TextBlock Text="Select your scanner from the dropdown menu"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                    CornerRadius="20" Width="32" Height="32">
+                                <TextBlock Text="3" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" Foreground="White" />
+                            </Border>
+                            <TextBlock Text="Adjust scan settings (resolution, color mode)"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                    CornerRadius="20" Width="32" Height="32">
+                                <TextBlock Text="4" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" Foreground="White" />
+                            </Border>
+                            <TextBlock Text="Click 'Scan Page' or press Ctrl+S"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                    CornerRadius="20" Width="32" Height="32">
+                                <TextBlock Text="5" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" Foreground="White" />
+                            </Border>
+                            <TextBlock Text="Export your document to PDF or images"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Keyboard Shortcuts -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Keyboard Shortcuts" Style="{StaticResource SectionTitleStyle}" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Ctrl + S" FontFamily="Consolas" Grid.Row="0" />
+                        <TextBlock Text="Scan a page" Grid.Row="0" Grid.Column="1" />
+
+                        <TextBlock Text="Ctrl + Shift + S" FontFamily="Consolas" Grid.Row="1" Margin="0,8,0,0" />
+                        <TextBlock Text="Scan all (ADF)" Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" />
+
+                        <TextBlock Text="Ctrl + E" FontFamily="Consolas" Grid.Row="2" Margin="0,8,0,0" />
+                        <TextBlock Text="Export document" Grid.Row="2" Grid.Column="1" Margin="0,8,0,0" />
+
+                        <TextBlock Text="Ctrl + N" FontFamily="Consolas" Grid.Row="3" Margin="0,8,0,0" />
+                        <TextBlock Text="New document" Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" />
+
+                        <TextBlock Text="Delete" FontFamily="Consolas" Grid.Row="4" Margin="0,8,0,0" />
+                        <TextBlock Text="Delete selected page" Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Tips -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Tips" Style="{StaticResource SectionTitleStyle}" />
+
+                    <StackPanel Spacing="12">
+                        <StackPanel>
+                            <TextBlock Text="Auto-Crop" FontWeight="SemiBold" />
+                            <TextBlock Text="Enable auto-crop to automatically detect and straighten documents on the scanner bed."
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock Text="OCR Text Recognition" FontWeight="SemiBold" />
+                            <TextBlock Text="Enable OCR to make your PDFs searchable. The text layer is invisible but allows you to search and copy text."
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock Text="Resolution Guide" FontWeight="SemiBold" />
+                            <TextBlock Text="Use 150 DPI for screen viewing, 300 DPI for printing, 600+ DPI for archival quality."
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock Text="Multi-Page Scanning" FontWeight="SemiBold" />
+                            <TextBlock Text="If your scanner has an ADF (automatic document feeder), use 'Scan All' to scan multiple pages at once."
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Scanner.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:local="using:Scanner.App.Views">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="24" MaxWidth="800" HorizontalAlignment="Left">
+
+            <TextBlock Text="Settings" Style="{StaticResource PageTitleStyle}" />
+
+            <!-- Default Scan Settings -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Default Scan Settings" Style="{StaticResource SectionTitleStyle}" />
+
+                    <ComboBox Header="Default Resolution (DPI)"
+                              HorizontalAlignment="Stretch"
+                              SelectedItem="{x:Bind ViewModel.DefaultDpi, Mode=TwoWay}">
+                        <x:Int32>75</x:Int32>
+                        <x:Int32>100</x:Int32>
+                        <x:Int32>150</x:Int32>
+                        <x:Int32>200</x:Int32>
+                        <x:Int32>300</x:Int32>
+                        <x:Int32>400</x:Int32>
+                        <x:Int32>600</x:Int32>
+                    </ComboBox>
+
+                    <ComboBox Header="Default Color Mode" HorizontalAlignment="Stretch">
+                        <ComboBoxItem Content="Color" IsSelected="True" />
+                        <ComboBoxItem Content="Grayscale" />
+                        <ComboBoxItem Content="Black &amp; White" />
+                    </ComboBox>
+
+                    <ComboBox Header="Default Paper Size" HorizontalAlignment="Stretch">
+                        <ComboBoxItem Content="Letter (8.5 x 11 in)" IsSelected="True" />
+                        <ComboBoxItem Content="Legal (8.5 x 14 in)" />
+                        <ComboBoxItem Content="A4 (210 x 297 mm)" />
+                        <ComboBoxItem Content="A5 (148 x 210 mm)" />
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+
+            <!-- Auto Processing -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Auto Processing" Style="{StaticResource SectionTitleStyle}" />
+
+                    <ToggleSwitch Header="Auto-crop documents"
+                                 IsOn="{x:Bind ViewModel.AutoCropEnabled, Mode=TwoWay}"
+                                 OnContent="Enabled" OffContent="Disabled" />
+
+                    <ToggleSwitch Header="Auto-enhance images"
+                                 IsOn="{x:Bind ViewModel.AutoEnhanceEnabled, Mode=TwoWay}"
+                                 OnContent="Enabled" OffContent="Disabled" />
+
+                    <ToggleSwitch Header="Automatic OCR text recognition"
+                                 IsOn="{x:Bind ViewModel.AutoOcrEnabled, Mode=TwoWay}"
+                                 OnContent="Enabled" OffContent="Disabled" />
+
+                    <ComboBox Header="OCR Language"
+                              HorizontalAlignment="Stretch"
+                              ItemsSource="{x:Bind ViewModel.AvailableLanguages}"
+                              DisplayMemberPath="Name" />
+                </StackPanel>
+            </Border>
+
+            <!-- API Keys -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="API Keys" Style="{StaticResource SectionTitleStyle}" />
+
+                    <TextBlock Text="Configure your OpenRouter API key for cloud-based OCR using Qwen2.5-VL. Get a key at openrouter.ai."
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               TextWrapping="Wrap" />
+
+                    <PasswordBox Header="OpenRouter API Key"
+                                 Password="{x:Bind ViewModel.OpenRouterApiKey, Mode=TwoWay}"
+                                 PlaceholderText="sk-or-v1-..."
+                                 HorizontalAlignment="Stretch" />
+
+                    <InfoBar x:Name="ApiKeyInfoBar"
+                             Title="No API key configured"
+                             Message="Cloud OCR (Qwen2.5-VL) requires an OpenRouter API key. Offline OCR via Tesseract will be used as fallback."
+                             Severity="Informational"
+                             IsOpen="{x:Bind ViewModel.IsApiKeyMissing, Mode=OneWay}"
+                             IsClosable="False" />
+                </StackPanel>
+            </Border>
+
+            <!-- Appearance -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Appearance" Style="{StaticResource SectionTitleStyle}" />
+
+                    <ToggleSwitch Header="Dark mode"
+                                 IsOn="{x:Bind ViewModel.DarkModeEnabled, Mode=TwoWay}"
+                                 OnContent="On" OffContent="Off" />
+
+                    <ToggleSwitch Header="Sound effects"
+                                 IsOn="{x:Bind ViewModel.SoundEnabled, Mode=TwoWay}"
+                                 OnContent="On" OffContent="Off" />
+                </StackPanel>
+            </Border>
+
+            <!-- Default Save Location -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Default Save Location" Style="{StaticResource SectionTitleStyle}" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Text="{x:Bind ViewModel.DefaultSavePath, Mode=TwoWay}"
+                                 IsReadOnly="True"
+                                 PlaceholderText="Select folder..." />
+                        <Button Grid.Column="1" Margin="8,0,0,0"
+                                Content="Browse..."
+                                Command="{x:Bind ViewModel.SelectDefaultSavePathCommand}" />
+                    </Grid>
+
+                    <ComboBox Header="Default Export Format" HorizontalAlignment="Stretch">
+                        <ComboBoxItem Content="PDF Document" IsSelected="True" />
+                        <ComboBoxItem Content="JPEG Image" />
+                        <ComboBoxItem Content="PNG Image" />
+                        <ComboBoxItem Content="TIFF Multi-page" />
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+
+            <!-- About -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="About" Style="{StaticResource SectionTitleStyle}" />
+
+                    <StackPanel Spacing="8">
+                        <TextBlock Style="{StaticResource BodyTextBlockStyle}">
+                            <Run Text="Scanner" FontWeight="SemiBold" />
+                            <Run Text=" - Modern Windows Scanner App" />
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                            <Run Text="Version " />
+                            <Run Text="{x:Bind ViewModel.AppVersion}" />
+                        </TextBlock>
+                    </StackPanel>
+
+                    <Button Content="Reset All Settings to Defaults"
+                            Command="{x:Bind ViewModel.ResetToDefaultsCommand}" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Scanner.App.Views.ScannerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:local="using:Scanner.App.Views">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="280" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel: Scanner Settings -->
+        <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,12,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="20">
+                    <TextBlock Text="Scan Settings" Style="{StaticResource SectionTitleStyle}" />
+
+                    <!-- Scanner Selection -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Scanner" Style="{StaticResource BodyTextBlockStyle}" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ComboBox x:Name="ScannerComboBox"
+                                      ItemsSource="{x:Bind ViewModel.AvailableScanners, Mode=OneWay}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedScanner, Mode=TwoWay}"
+                                      HorizontalAlignment="Stretch"
+                                      PlaceholderText="Select scanner..." />
+                            <Button Grid.Column="1" Margin="8,0,0,0"
+                                    Command="{x:Bind ViewModel.RefreshScannersCommand}"
+                                    ToolTipService.ToolTip="Refresh scanner list">
+                                <FontIcon Glyph="&#xE72C;" FontSize="14" />
+                            </Button>
+                        </Grid>
+                        <InfoBar x:Name="NoScannersInfo"
+                                 IsOpen="{x:Bind ViewModel.HasNoScanners, Mode=OneWay}"
+                                 Severity="Warning"
+                                 Title="No scanners found"
+                                 Message="Connect a scanner and click refresh." />
+                    </StackPanel>
+
+                    <!-- Scan Source -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Scan Source" Style="{StaticResource BodyTextBlockStyle}" />
+                        <ComboBox x:Name="SourceComboBox"
+                                  ItemsSource="{x:Bind ViewModel.AvailableSources, Mode=OneWay}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedSource, Mode=TwoWay}"
+                                  HorizontalAlignment="Stretch"
+                                  PlaceholderText="Select source..."
+                                  IsEnabled="{x:Bind ViewModel.SelectedScanner, Mode=OneWay, Converter={StaticResource NullToBoolConverter}}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding DisplayName}" />
+                                        <TextBlock Text="{Binding Description}"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Color Mode -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Color Mode" Style="{StaticResource BodyTextBlockStyle}" />
+                        <controls:Segmented x:Name="ColorModeSegmented"
+                                           SelectionMode="Single"
+                                           SelectedIndex="0">
+                            <controls:SegmentedItem Content="Color" Tag="Color" />
+                            <controls:SegmentedItem Content="Gray" Tag="Grayscale" />
+                            <controls:SegmentedItem Content="B&amp;W" Tag="BlackAndWhite" />
+                        </controls:Segmented>
+                    </StackPanel>
+
+                    <!-- Resolution -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Resolution (DPI)" Style="{StaticResource BodyTextBlockStyle}" />
+                        <ComboBox x:Name="DpiComboBox"
+                                  ItemsSource="{x:Bind ViewModel.AvailableDpiValues, Mode=OneWay}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedDpi, Mode=TwoWay}"
+                                  HorizontalAlignment="Stretch"
+                                  IsEnabled="{x:Bind ViewModel.SelectedScanner, Mode=OneWay, Converter={StaticResource NullToBoolConverter}}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="x:Int32">
+                                    <TextBlock>
+                                        <Run Text="{x:Bind}" />
+                                        <Run Text=" DPI" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Brightness / Contrast -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Brightness" Style="{StaticResource BodyTextBlockStyle}" />
+                        <Slider x:Name="BrightnessSlider"
+                                Value="{x:Bind ViewModel.Settings.Brightness, Mode=TwoWay}"
+                                Minimum="-100" Maximum="100"
+                                TickFrequency="25" TickPlacement="BottomRight"
+                                IsEnabled="{x:Bind ViewModel.SelectedScanner, Mode=OneWay, Converter={StaticResource NullToBoolConverter}}" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Contrast" Style="{StaticResource BodyTextBlockStyle}" />
+                        <Slider x:Name="ContrastSlider"
+                                Value="{x:Bind ViewModel.Settings.Contrast, Mode=TwoWay}"
+                                Minimum="-100" Maximum="100"
+                                TickFrequency="25" TickPlacement="BottomRight"
+                                IsEnabled="{x:Bind ViewModel.SelectedScanner, Mode=OneWay, Converter={StaticResource NullToBoolConverter}}" />
+                    </StackPanel>
+
+                    <!-- Paper Size -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Paper Size" Style="{StaticResource BodyTextBlockStyle}" />
+                        <ComboBox x:Name="PaperSizeComboBox" HorizontalAlignment="Stretch">
+                            <ComboBoxItem Content="Letter (8.5 x 11 in)" Tag="Letter" IsSelected="True" />
+                            <ComboBoxItem Content="Legal (8.5 x 14 in)" Tag="Legal" />
+                            <ComboBoxItem Content="A4 (210 x 297 mm)" Tag="A4" />
+                            <ComboBoxItem Content="A5 (148 x 210 mm)" Tag="A5" />
+                        </ComboBox>
+                    </StackPanel>
+
+                    <MenuFlyoutSeparator />
+
+                    <!-- Auto Processing -->
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Auto Processing" Style="{StaticResource BodyTextBlockStyle}" />
+
+                        <ToggleSwitch Header="Auto-Crop"
+                                     IsOn="{x:Bind ViewModel.Settings.AutoCrop, Mode=TwoWay}"
+                                     OnContent="Enabled" OffContent="Disabled" />
+
+                        <ToggleSwitch Header="Auto-Enhance"
+                                     IsOn="{x:Bind ViewModel.Settings.AutoEnhance, Mode=TwoWay}"
+                                     OnContent="Enabled" OffContent="Disabled" />
+
+                        <ToggleSwitch Header="OCR Text Recognition"
+                                     IsOn="{x:Bind ViewModel.Settings.AutoOcr, Mode=TwoWay}"
+                                     OnContent="Enabled" OffContent="Disabled" />
+                    </StackPanel>
+
+                    <MenuFlyoutSeparator />
+
+                    <!-- Scan Buttons -->
+                    <StackPanel Spacing="12">
+                        <Button Content="Scan Page"
+                                Style="{StaticResource AccentButtonStyle}"
+                                HorizontalAlignment="Stretch"
+                                Command="{x:Bind ViewModel.ScanCommand}">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="S" Modifiers="Control" />
+                            </Button.KeyboardAccelerators>
+                        </Button>
+
+                        <Button Content="Scan All (ADF)"
+                                HorizontalAlignment="Stretch"
+                                Command="{x:Bind ViewModel.ScanMultipleCommand}"
+                                IsEnabled="{x:Bind ViewModel.SelectedScanner.SupportsAdf, Mode=OneWay, FallbackValue=False}">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="S" Modifiers="Control,Shift" />
+                            </Button.KeyboardAccelerators>
+                        </Button>
+
+                        <Button Content="Cancel"
+                                HorizontalAlignment="Stretch"
+                                Command="{x:Bind ViewModel.CancelScanCommand}"
+                                Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Center: Preview Area -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Image Preview -->
+            <Border Grid.Row="0"
+                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Margin="0,0,12,12">
+                <Grid>
+                    <!-- No Image Placeholder -->
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Visibility="{x:Bind ViewModel.PreviewPage, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Invert}">
+                        <FontIcon Glyph="&#xE8A5;" FontSize="64"
+                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock Text="No scanned image"
+                                   Style="{StaticResource BodyTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,16,0,0" />
+                        <TextBlock Text="Click 'Scan Page' to start scanning"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <!-- Scanned Image -->
+                    <ScrollViewer ZoomMode="Enabled"
+                                  MinZoomFactor="0.1"
+                                  MaxZoomFactor="5"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto">
+                        <Image x:Name="PreviewImage"
+                               Stretch="Uniform"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                    </ScrollViewer>
+
+                    <!-- Scanning Progress Overlay -->
+                    <Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                          Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ProgressRing IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}"
+                                          Width="60" Height="60" />
+                            <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,16,0,0" />
+                            <ProgressBar Value="{x:Bind ViewModel.ScanProgress, Mode=OneWay}"
+                                         Width="200"
+                                         Margin="0,12,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Status Bar -->
+            <Border Grid.Row="1"
+                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                    CornerRadius="4"
+                    Padding="12,8"
+                    Margin="0,0,12,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" />
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}"
+                                   VerticalAlignment="Center">
+                            <Run Text="Pages:" />
+                            <Run Text="{x:Bind ViewModel.CurrentDocument.PageCount, Mode=OneWay}" FontWeight="SemiBold" />
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Right Panel: Page Thumbnails -->
+        <Border Grid.Column="2" Style="{StaticResource CardStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="Pages" Style="{StaticResource SectionTitleStyle}" Margin="0" />
+                    <TextBlock Text="{x:Bind ViewModel.CurrentDocument.PageCount, Mode=OneWay}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center"
+                               Margin="8,0,0,0"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+
+                <!-- Thumbnail List -->
+                <ListView Grid.Row="1"
+                          x:Name="PageListView"
+                          ItemsSource="{x:Bind ViewModel.CurrentDocument.Pages, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.PreviewPage, Mode=TwoWay}"
+                          CanDragItems="True"
+                          CanReorderItems="True"
+                          AllowDrop="True"
+                          SelectionMode="Single">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="4" ToolTipService.ToolTip="{Binding PageNumber}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Thumbnail placeholder -->
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                        CornerRadius="4"
+                                        Width="60" Height="80">
+                                    <FontIcon Glyph="&#xE8A5;" FontSize="24"
+                                              Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </Border>
+
+                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource BodyTextBlockStyle}">
+                                        <Run Text="Page " />
+                                        <Run Text="{Binding PageNumber}" />
+                                    </TextBlock>
+                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               Text="{Binding ScannedAt}" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- Actions -->
+                <StackPanel Grid.Row="2" Spacing="8" Margin="0,12,0,0">
+                    <Button Content="New Document"
+                            HorizontalAlignment="Stretch"
+                            Command="{x:Bind ViewModel.NewDocumentCommand}" />
+                    <Button Content="Clear All"
+                            HorizontalAlignment="Stretch"
+                            Command="{x:Bind ViewModel.ClearDocumentCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

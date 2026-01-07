@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Scanner.App.Views.ExportPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Scanner.App.Views">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="24" MaxWidth="800" HorizontalAlignment="Left">
+
+            <TextBlock Text="Export Document" Style="{StaticResource PageTitleStyle}" />
+
+            <!-- Export Format -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Export Format" Style="{StaticResource SectionTitleStyle}" />
+
+                    <RadioButtons Header="Select format:">
+                        <RadioButton Content="PDF Document (.pdf)" IsChecked="True" Tag="Pdf" />
+                        <RadioButton Content="JPEG Image (.jpg)" Tag="Jpeg" />
+                        <RadioButton Content="PNG Image (.png)" Tag="Png" />
+                        <RadioButton Content="TIFF Multi-page (.tiff)" Tag="Tiff" />
+                    </RadioButtons>
+                </StackPanel>
+            </Border>
+
+            <!-- PDF Options -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="PDF Options" Style="{StaticResource SectionTitleStyle}" />
+
+                    <ToggleSwitch Header="Include searchable text layer (OCR)"
+                                 IsOn="{x:Bind ViewModel.IncludeOcrText, Mode=TwoWay}"
+                                 OnContent="Enabled" OffContent="Disabled" />
+
+                    <ComboBox Header="Compression" HorizontalAlignment="Stretch">
+                        <ComboBoxItem Content="Auto (Recommended)" IsSelected="True" />
+                        <ComboBoxItem Content="High Quality (larger file)" />
+                        <ComboBoxItem Content="Medium Quality" />
+                        <ComboBoxItem Content="Low Quality (smaller file)" />
+                    </ComboBox>
+
+                    <TextBox Header="Document Title"
+                             Text="{x:Bind ViewModel.FileName, Mode=TwoWay}"
+                             PlaceholderText="Enter document title..." />
+                </StackPanel>
+            </Border>
+
+            <!-- Save Location -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Save To" Style="{StaticResource SectionTitleStyle}" />
+
+                    <Button Content="Save to Local Folder"
+                            Style="{StaticResource AccentButtonStyle}"
+                            HorizontalAlignment="Stretch"
+                            Command="{x:Bind ViewModel.ExportToLocalCommand}">
+                        <Button.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="S" Modifiers="Control" />
+                        </Button.KeyboardAccelerators>
+                    </Button>
+
+                    <MenuFlyoutSeparator />
+
+                    <TextBlock Text="Or save to cloud:" Style="{StaticResource BodyTextBlockStyle}" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button HorizontalAlignment="Stretch" Margin="0,0,6,0">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE753;" FontSize="16" />
+                                <TextBlock Text="OneDrive" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="1" HorizontalAlignment="Stretch" Margin="6,0,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE753;" FontSize="16" />
+                                <TextBlock Text="Google Drive" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Export Progress -->
+            <Border Style="{StaticResource CardStyle}"
+                    Visibility="{x:Bind ViewModel.IsExporting, Mode=OneWay}">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Exporting..." Style="{StaticResource SectionTitleStyle}" />
+                    <ProgressBar Value="{x:Bind ViewModel.ExportProgress, Mode=OneWay}"
+                                 Maximum="100" />
+                    <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

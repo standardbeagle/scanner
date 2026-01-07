@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Scanner.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Scanner.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

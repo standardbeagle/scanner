@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application
+    x:Class="Scanner.App.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Scanner.App.Converters"
+    xmlns:local="using:Scanner.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Converters -->
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+
+            <!-- App Colors -->
+            <Color x:Key="AccentColor">#0078D4</Color>
+            <Color x:Key="AccentColorLight">#429CE3</Color>
+            <Color x:Key="ScannerGreen">#107C10</Color>
+
+            <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+            <SolidColorBrush x:Key="AccentBrushLight" Color="{StaticResource AccentColorLight}" />
+            <SolidColorBrush x:Key="ScannerGreenBrush" Color="{StaticResource ScannerGreen}" />
+
+            <!-- Typography -->
+            <x:Double x:Key="TitleFontSize">28</x:Double>
+            <x:Double x:Key="SubtitleFontSize">20</x:Double>
+            <x:Double x:Key="BodyFontSize">14</x:Double>
+            <x:Double x:Key="CaptionFontSize">12</x:Double>
+
+            <!-- Common Styles -->
+            <Style x:Key="PageTitleStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="{StaticResource TitleFontSize}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Margin" Value="0,0,0,24" />
+            </Style>
+
+            <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="{StaticResource SubtitleFontSize}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Margin" Value="0,0,0,12" />
+            </Style>
+
+            <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
+                <Setter Property="Padding" Value="24,12" />
+                <Setter Property="FontSize" Value="14" />
+            </Style>
+
+            <Style x:Key="IconButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Padding" Value="8" />
+                <Setter Property="BorderThickness" Value="0" />
+            </Style>
+
+            <!-- Card Style -->
+            <Style x:Key="CardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Padding" Value="16" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

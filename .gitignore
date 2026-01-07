@@ -1,0 +1,46 @@
+# Build results
+bin/
+obj/
+publish/
+out/
+
+# IDE
+.vs/
+*.user
+*.suo
+*.sln.docstates
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+coverage/
+
+# NuGet
+*.nupkg
+packages/
+
+# Tessdata (downloaded separately)
+tessdata/
+
+# WinUI / MSIX
+AppPackages/
+BundleArtifacts/
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+*.appxupload
+
+# Secrets / local config
+appsettings.*.json
+!appsettings.json
+*.pfx
+*.snk
