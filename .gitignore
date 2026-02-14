@@ -39,6 +39,14 @@ BundleArtifacts/
 *.appxbundle
 *.appxupload
 
+# Installer output (Inno Setup)
+installer/Output/
+*.exe
+!src/**/*.exe
+
+# Archives
+*.zip
+
 # Secrets / local config
 appsettings.*.json
 !appsettings.json
