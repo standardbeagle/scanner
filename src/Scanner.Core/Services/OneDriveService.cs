@@ -13,13 +13,13 @@ namespace Scanner.Core.Services;
 /// </summary>
 public class OneDriveService : ICloudStorageService
 {
+    private const string ClientId = "aa81ea9c-c090-423c-ba1a-7d5d33131a35";
     private static readonly string[] Scopes = ["Files.ReadWrite", "offline_access"];
     private static readonly string GraphBase = "https://graph.microsoft.com/v1.0";
     private static readonly string TokenCachePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "ScannerApp", "onedrive-token-cache.bin");
 
-    private readonly SettingsViewModel _settings;
     private readonly HttpClient _http = new();
     private IPublicClientApplication? _msalApp;
     private string? _accessToken;
@@ -28,21 +28,12 @@ public class OneDriveService : ICloudStorageService
     public string ProviderName => "OneDrive";
     public CloudStorageProvider Provider => CloudStorageProvider.OneDrive;
 
-    public OneDriveService(SettingsViewModel settings)
-    {
-        _settings = settings;
-    }
-
     private IPublicClientApplication GetMsalApp()
     {
-        if (string.IsNullOrWhiteSpace(_settings.OneDriveClientId))
-            throw new InvalidOperationException(
-                "OneDrive Client ID is not configured. Enter it in Settings.");
-
-        if (_msalApp == null || _msalApp.AppConfig.ClientId != _settings.OneDriveClientId)
+        if (_msalApp == null)
         {
             _msalApp = PublicClientApplicationBuilder
-                .Create(_settings.OneDriveClientId)
+                .Create(ClientId)
                 .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.PersonalMicrosoftAccount)
                 .WithDefaultRedirectUri()
                 .Build();
@@ -69,9 +60,6 @@ public class OneDriveService : ICloudStorageService
     {
         if (_tokenExpiry > DateTimeOffset.UtcNow.AddMinutes(5))
             return true;
-
-        if (string.IsNullOrWhiteSpace(_settings.OneDriveClientId))
-            return false;
 
         try
         {

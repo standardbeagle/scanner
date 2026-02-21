@@ -16,38 +16,26 @@ namespace Scanner.Core.Services;
 /// </summary>
 public class GoogleDriveService : ICloudStorageService
 {
+    // Register at console.cloud.google.com → APIs & Services → Credentials → Desktop app
+    private const string GoogleClientId = "REPLACE_WITH_GOOGLE_CLIENT_ID";
+    private const string GoogleClientSecret = "REPLACE_WITH_GOOGLE_CLIENT_SECRET";
+
     private static readonly string[] Scopes = [DriveService.Scope.DriveFile];
     private static readonly string TokenStorePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "ScannerApp", "google-tokens");
 
-    private readonly SettingsViewModel _settings;
+    private static readonly ClientSecrets Secrets = new()
+    {
+        ClientId = GoogleClientId,
+        ClientSecret = GoogleClientSecret
+    };
+
     private DriveService? _driveService;
     private UserCredential? _credential;
 
     public string ProviderName => "Google Drive";
     public CloudStorageProvider Provider => CloudStorageProvider.GoogleDrive;
-
-    public GoogleDriveService(SettingsViewModel settings)
-    {
-        _settings = settings;
-    }
-
-    private ClientSecrets GetClientSecrets()
-    {
-        if (string.IsNullOrWhiteSpace(_settings.GoogleDriveClientId))
-            throw new InvalidOperationException(
-                "Google Drive Client ID is not configured. Enter it in Settings.");
-        if (string.IsNullOrWhiteSpace(_settings.GoogleDriveClientSecret))
-            throw new InvalidOperationException(
-                "Google Drive Client Secret is not configured. Enter it in Settings.");
-
-        return new ClientSecrets
-        {
-            ClientId = _settings.GoogleDriveClientId,
-            ClientSecret = _settings.GoogleDriveClientSecret
-        };
-    }
 
     public async Task<bool> IsAuthenticatedAsync(CancellationToken ct = default)
     {
@@ -57,8 +45,6 @@ public class GoogleDriveService : ICloudStorageService
             if (!_credential.Token.IsStale) return true;
             return await _credential.RefreshTokenAsync(ct);
         }
-
-        if (string.IsNullOrWhiteSpace(_settings.GoogleDriveClientId)) return false;
 
         // Check whether a stored refresh token exists on disk (no browser prompt)
         var store = new FileDataStore(TokenStorePath, true);
@@ -70,7 +56,7 @@ public class GoogleDriveService : ICloudStorageService
         try
         {
             _credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                GetClientSecrets(), Scopes, "user", ct, store);
+                Secrets, Scopes, "user", ct, store);
             _driveService = BuildDriveService();
             return true;
         }
@@ -85,7 +71,7 @@ public class GoogleDriveService : ICloudStorageService
         // GoogleWebAuthorizationBroker: silent if token cached, browser otherwise
         var store = new FileDataStore(TokenStorePath, true);
         _credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-            GetClientSecrets(), Scopes, "user", ct, store);
+            Secrets, Scopes, "user", ct, store);
 
         _driveService = BuildDriveService();
         return true;

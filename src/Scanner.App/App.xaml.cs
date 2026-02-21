@@ -76,8 +76,8 @@ public partial class App : Application
         services.AddSingleton<OcrService>();
 
         services.AddSingleton<IExportService, ExportService>();
-        services.AddSingleton<OneDriveService>(sp => new OneDriveService(sp.GetRequiredService<SettingsViewModel>()));
-        services.AddSingleton<GoogleDriveService>(sp => new GoogleDriveService(sp.GetRequiredService<SettingsViewModel>()));
+        services.AddSingleton<OneDriveService>();
+        services.AddSingleton<GoogleDriveService>();
         services.AddSingleton<ICloudStorageService>(sp => sp.GetRequiredService<OneDriveService>());
         services.AddSingleton<ICloudStorageService>(sp => sp.GetRequiredService<GoogleDriveService>());
 
