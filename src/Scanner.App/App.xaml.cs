@@ -33,6 +33,20 @@ public partial class App : Application
     {
         Services = ConfigureServices();
         this.InitializeComponent();
+        this.UnhandledException += OnUnhandledException;
+    }
+
+    private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        e.Handled = true;
+        var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+        {
+            Title = "Unexpected Error",
+            Content = $"An unexpected error occurred:\n\n{e.Message}\n\nThe application will continue running, but some features may not work correctly.",
+            CloseButtonText = "OK",
+            XamlRoot = _window?.Content?.XamlRoot
+        };
+        _ = dialog.ShowAsync();
     }
 
     /// <summary>
@@ -101,6 +115,13 @@ public partial class App : Application
 
     private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
     {
-        throw new Exception($"Failed to load Page {e.SourcePageType.FullName}");
+        var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+        {
+            Title = "Navigation Error",
+            Content = $"Failed to load page '{e.SourcePageType.Name}'.\n\n{e.Exception?.Message}",
+            CloseButtonText = "OK",
+            XamlRoot = _window?.Content?.XamlRoot
+        };
+        _ = dialog.ShowAsync();
     }
 }

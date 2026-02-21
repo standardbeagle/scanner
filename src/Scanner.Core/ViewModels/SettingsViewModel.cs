@@ -62,10 +62,13 @@ public partial class SettingsViewModel : ObservableObject
     /// </summary>
     public event EventHandler? ApiKeyChanged;
 
+    private bool _isLoading;
+
     partial void OnOpenRouterApiKeyChanged(string value)
     {
         OnPropertyChanged(nameof(IsApiKeyMissing));
-        SaveSettings();
+        if (!_isLoading)
+            SaveSettings();
         ApiKeyChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -82,25 +85,30 @@ public partial class SettingsViewModel : ObservableObject
         if (!File.Exists(SettingsFilePath))
             return;
 
+        _isLoading = true;
         try
         {
             var json = File.ReadAllText(SettingsFilePath);
             var data = JsonSerializer.Deserialize<SettingsData>(json);
             if (data == null) return;
 
-            _defaultDpi = data.DefaultDpi ?? _defaultDpi;
-            _autoCropEnabled = data.AutoCropEnabled ?? _autoCropEnabled;
-            _autoEnhanceEnabled = data.AutoEnhanceEnabled ?? _autoEnhanceEnabled;
-            _autoOcrEnabled = data.AutoOcrEnabled ?? _autoOcrEnabled;
-            _ocrLanguage = data.OcrLanguage ?? _ocrLanguage;
-            _defaultSavePath = data.DefaultSavePath ?? _defaultSavePath;
-            _darkModeEnabled = data.DarkModeEnabled ?? _darkModeEnabled;
-            _soundEnabled = data.SoundEnabled ?? _soundEnabled;
-            _openRouterApiKey = data.OpenRouterApiKey ?? _openRouterApiKey;
+            DefaultDpi = data.DefaultDpi ?? DefaultDpi;
+            AutoCropEnabled = data.AutoCropEnabled ?? AutoCropEnabled;
+            AutoEnhanceEnabled = data.AutoEnhanceEnabled ?? AutoEnhanceEnabled;
+            AutoOcrEnabled = data.AutoOcrEnabled ?? AutoOcrEnabled;
+            OcrLanguage = data.OcrLanguage ?? OcrLanguage;
+            DefaultSavePath = data.DefaultSavePath ?? DefaultSavePath;
+            DarkModeEnabled = data.DarkModeEnabled ?? DarkModeEnabled;
+            SoundEnabled = data.SoundEnabled ?? SoundEnabled;
+            OpenRouterApiKey = data.OpenRouterApiKey ?? OpenRouterApiKey;
         }
         catch (Exception)
         {
             // If settings file is corrupt, use defaults
+        }
+        finally
+        {
+            _isLoading = false;
         }
     }
 

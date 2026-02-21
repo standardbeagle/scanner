@@ -10,6 +10,7 @@
         <EnableMsixTooling>true</EnableMsixTooling>
         <WindowsPackageType>None</WindowsPackageType>
         <WindowsAppSdkDeploymentType>SelfContained</WindowsAppSdkDeploymentType>
+        <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 
         <!-- Project Options -->
         <Nullable>enable</Nullable>

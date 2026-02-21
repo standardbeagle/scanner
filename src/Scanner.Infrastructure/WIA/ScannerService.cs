@@ -12,8 +12,10 @@ public class ScannerService : IScannerService, IDisposable
     private readonly WiaDeviceManager _deviceManager;
     private bool _disposed;
 
+#pragma warning disable CS0067 // Events wired up when WIA device monitoring is implemented
     public event EventHandler<ScannerEventArgs>? ScannerConnected;
     public event EventHandler<ScannerEventArgs>? ScannerDisconnected;
+#pragma warning restore CS0067
 
     public ScannerService()
     {
