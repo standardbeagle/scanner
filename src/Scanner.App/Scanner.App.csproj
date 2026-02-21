@@ -9,6 +9,7 @@
         <UseWinUI>true</UseWinUI>
         <EnableMsixTooling>true</EnableMsixTooling>
         <WindowsPackageType>None</WindowsPackageType>
+        <WindowsAppSdkDeploymentType>SelfContained</WindowsAppSdkDeploymentType>
 
         <!-- Project Options -->
         <Nullable>enable</Nullable>
@@ -35,7 +36,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.*" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.*" />
         <PackageReference Include="Microsoft.Web.WebView2" Version="1.*" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.*" />
 

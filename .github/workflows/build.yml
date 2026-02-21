@@ -46,12 +46,6 @@ jobs:
             echo "version=0.0.0-dev" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Download Windows App SDK runtime
-        run: |
-          Invoke-WebRequest `
-            -Uri "https://aka.ms/windowsappsdk/1.6/latest/windowsappruntimeinstall-x64.exe" `
-            -OutFile "installer\WindowsAppRuntimeInstall-x64.exe"
-
       - name: Build installer
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
