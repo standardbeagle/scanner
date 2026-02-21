@@ -1,57 +1,130 @@
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Responses;
+using Google.Apis.Drive.v3;
+using Google.Apis.Drive.v3.Data;
+using DriveFile = Google.Apis.Drive.v3.Data.File;
+using Google.Apis.Services;
+using Google.Apis.Upload;
+using Google.Apis.Util.Store;
 using Scanner.Core.Models;
 using Scanner.Core.Services.Interfaces;
 
 namespace Scanner.Core.Services;
 
 /// <summary>
-/// Google Drive cloud storage service.
-/// Note: Requires Google Cloud Console OAuth credentials for full functionality.
+/// Google Drive cloud storage service using Google APIs + OAuth2.
 /// </summary>
 public class GoogleDriveService : ICloudStorageService
 {
-    private bool _isAuthenticated;
+    private static readonly string[] Scopes = [DriveService.Scope.DriveFile];
+    private static readonly string TokenStorePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "ScannerApp", "google-tokens");
+
+    private readonly SettingsViewModel _settings;
+    private DriveService? _driveService;
+    private UserCredential? _credential;
 
     public string ProviderName => "Google Drive";
     public CloudStorageProvider Provider => CloudStorageProvider.GoogleDrive;
 
-    public Task<bool> IsAuthenticatedAsync(CancellationToken ct = default)
+    public GoogleDriveService(SettingsViewModel settings)
     {
-        return Task.FromResult(_isAuthenticated);
+        _settings = settings;
     }
 
-    public Task<bool> AuthenticateAsync(CancellationToken ct = default)
+    private ClientSecrets GetClientSecrets()
     {
-        // TODO: Implement with Google.Apis.Drive.v3 and OAuth credentials
-        // For production, you would:
-        // 1. Create OAuth credentials in Google Cloud Console
-        // 2. Download credentials.json
-        // 3. Use GoogleWebAuthorizationBroker for authentication
-        // 4. Use DriveService for file operations
+        if (string.IsNullOrWhiteSpace(_settings.GoogleDriveClientId))
+            throw new InvalidOperationException(
+                "Google Drive Client ID is not configured. Enter it in Settings.");
+        if (string.IsNullOrWhiteSpace(_settings.GoogleDriveClientSecret))
+            throw new InvalidOperationException(
+                "Google Drive Client Secret is not configured. Enter it in Settings.");
 
-        // Placeholder - always returns false until properly configured
-        _isAuthenticated = false;
-        return Task.FromResult(false);
+        return new ClientSecrets
+        {
+            ClientId = _settings.GoogleDriveClientId,
+            ClientSecret = _settings.GoogleDriveClientSecret
+        };
     }
 
-    public Task SignOutAsync(CancellationToken ct = default)
+    public async Task<bool> IsAuthenticatedAsync(CancellationToken ct = default)
     {
-        _isAuthenticated = false;
-        return Task.CompletedTask;
+        // If we have an active, non-stale credential, report authenticated
+        if (_credential != null)
+        {
+            if (!_credential.Token.IsStale) return true;
+            return await _credential.RefreshTokenAsync(ct);
+        }
+
+        if (string.IsNullOrWhiteSpace(_settings.GoogleDriveClientId)) return false;
+
+        // Check whether a stored refresh token exists on disk (no browser prompt)
+        var store = new FileDataStore(TokenStorePath, true);
+        var stored = await store.GetAsync<TokenResponse>("user");
+        if (stored?.RefreshToken == null) return false;
+
+        // Restore session silently using stored token (GoogleWebAuthorizationBroker
+        // returns immediately when a valid token exists in the DataStore)
+        try
+        {
+            _credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                GetClientSecrets(), Scopes, "user", ct, store);
+            _driveService = BuildDriveService();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
-    public Task<CloudFolder> GetRootFolderAsync(CancellationToken ct = default)
+    public async Task<bool> AuthenticateAsync(CancellationToken ct = default)
+    {
+        // GoogleWebAuthorizationBroker: silent if token cached, browser otherwise
+        var store = new FileDataStore(TokenStorePath, true);
+        _credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+            GetClientSecrets(), Scopes, "user", ct, store);
+
+        _driveService = BuildDriveService();
+        return true;
+    }
+
+    public async Task SignOutAsync(CancellationToken ct = default)
+    {
+        if (_credential != null)
+        {
+            await _credential.RevokeTokenAsync(ct);
+            _credential = null;
+        }
+
+        _driveService = null;
+
+        var store = new FileDataStore(TokenStorePath, true);
+        await store.ClearAsync();
+    }
+
+    public async Task<CloudFolder> GetRootFolderAsync(CancellationToken ct = default)
     {
         EnsureAuthenticated();
-        return Task.FromResult(new CloudFolder("root", "My Drive", "/"));
+        var req = _driveService!.Files.Get("root");
+        req.Fields = "id,name";
+        var root = await req.ExecuteAsync(ct);
+        return new CloudFolder(root.Id, "My Drive", "/");
     }
 
-    public Task<IReadOnlyList<CloudFolder>> GetFoldersAsync(string folderId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<CloudFolder>> GetFoldersAsync(string folderId, CancellationToken ct = default)
     {
         EnsureAuthenticated();
-        return Task.FromResult<IReadOnlyList<CloudFolder>>([]);
+        var req = _driveService!.Files.List();
+        req.Q = $"'{folderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false";
+        req.Fields = "files(id,name)";
+        var result = await req.ExecuteAsync(ct);
+        return result.Files.Select(f => new CloudFolder(f.Id, f.Name, f.Name)).ToList();
     }
 
-    public Task<CloudFile> UploadFileAsync(
+    public async Task<CloudFile> UploadFileAsync(
         string folderId,
         string fileName,
         Stream content,
@@ -59,18 +132,57 @@ public class GoogleDriveService : ICloudStorageService
         CancellationToken ct = default)
     {
         EnsureAuthenticated();
-        throw new NotImplementedException("Google Drive integration requires OAuth credentials setup.");
+
+        var metadata = new DriveFile
+        {
+            Name = fileName,
+            Parents = [folderId]
+        };
+
+        var req = _driveService!.Files.Create(metadata, content, GetMimeType(fileName));
+        req.Fields = "id,name,webViewLink";
+
+        if (progress != null && content.CanSeek)
+        {
+            var totalSize = content.Length;
+            req.ProgressChanged += p =>
+            {
+                if (totalSize > 0) progress.Report((double)p.BytesSent / totalSize);
+            };
+        }
+
+        var result = await req.UploadAsync(ct);
+
+        if (result.Status == UploadStatus.Failed)
+            throw new IOException($"Google Drive upload failed: {result.Exception?.Message}");
+
+        var file = req.ResponseBody;
+        return new CloudFile(file.Id, file.Name, file.WebViewLink ?? string.Empty);
     }
 
     public Task<string> GetUploadUrlAsync(string folderId, string fileName, CancellationToken ct = default)
-    {
-        EnsureAuthenticated();
-        return Task.FromResult(string.Empty);
-    }
+        => Task.FromResult(string.Empty);
+
+    private DriveService BuildDriveService() =>
+        new(new BaseClientService.Initializer
+        {
+            HttpClientInitializer = _credential,
+            ApplicationName = "Scanner"
+        });
 
     private void EnsureAuthenticated()
     {
-        if (!_isAuthenticated)
-            throw new InvalidOperationException("Not authenticated. Configure Google OAuth credentials first.");
+        if (_driveService == null)
+            throw new InvalidOperationException("Not authenticated with Google Drive. Sign in first.");
     }
+
+    private static string GetMimeType(string fileName) =>
+        Path.GetExtension(fileName).ToLowerInvariant() switch
+        {
+            ".pdf" => "application/pdf",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".tiff" or ".tif" => "image/tiff",
+            _ => "application/octet-stream"
+        };
 }

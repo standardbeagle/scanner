@@ -55,6 +55,15 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _openRouterApiKey = "";
 
+    [ObservableProperty]
+    private string _oneDriveClientId = "";
+
+    [ObservableProperty]
+    private string _googleDriveClientId = "";
+
+    [ObservableProperty]
+    private string _googleDriveClientSecret = "";
+
     public bool IsApiKeyMissing => string.IsNullOrWhiteSpace(OpenRouterApiKey);
 
     /// <summary>
@@ -101,6 +110,9 @@ public partial class SettingsViewModel : ObservableObject
             DarkModeEnabled = data.DarkModeEnabled ?? DarkModeEnabled;
             SoundEnabled = data.SoundEnabled ?? SoundEnabled;
             OpenRouterApiKey = data.OpenRouterApiKey ?? OpenRouterApiKey;
+            OneDriveClientId = data.OneDriveClientId ?? OneDriveClientId;
+            GoogleDriveClientId = data.GoogleDriveClientId ?? GoogleDriveClientId;
+            GoogleDriveClientSecret = data.GoogleDriveClientSecret ?? GoogleDriveClientSecret;
         }
         catch (Exception)
         {
@@ -133,6 +145,9 @@ public partial class SettingsViewModel : ObservableObject
                 DarkModeEnabled = DarkModeEnabled,
                 SoundEnabled = SoundEnabled,
                 OpenRouterApiKey = OpenRouterApiKey,
+                OneDriveClientId = OneDriveClientId,
+                GoogleDriveClientId = GoogleDriveClientId,
+                GoogleDriveClientSecret = GoogleDriveClientSecret,
             };
 
             var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
@@ -230,4 +245,7 @@ internal class SettingsData
     public bool? DarkModeEnabled { get; set; }
     public bool? SoundEnabled { get; set; }
     public string? OpenRouterApiKey { get; set; }
+    public string? OneDriveClientId { get; set; }
+    public string? GoogleDriveClientId { get; set; }
+    public string? GoogleDriveClientSecret { get; set; }
 }

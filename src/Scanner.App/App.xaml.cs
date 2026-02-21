@@ -76,13 +76,17 @@ public partial class App : Application
         services.AddSingleton<OcrService>();
 
         services.AddSingleton<IExportService, ExportService>();
-        services.AddSingleton<ICloudStorageService, OneDriveService>();
-        services.AddSingleton<ICloudStorageService, GoogleDriveService>();
+        services.AddSingleton<OneDriveService>(sp => new OneDriveService(sp.GetRequiredService<SettingsViewModel>()));
+        services.AddSingleton<GoogleDriveService>(sp => new GoogleDriveService(sp.GetRequiredService<SettingsViewModel>()));
+        services.AddSingleton<ICloudStorageService>(sp => sp.GetRequiredService<OneDriveService>());
+        services.AddSingleton<ICloudStorageService>(sp => sp.GetRequiredService<GoogleDriveService>());
 
         // Register ViewModels
         services.AddTransient<ScannerViewModel>();
         services.AddTransient<DocumentViewModel>();
-        services.AddTransient<ExportViewModel>();
+        services.AddTransient<ExportViewModel>(sp => new ExportViewModel(
+            sp.GetRequiredService<IExportService>(),
+            sp.GetServices<ICloudStorageService>()));
 
         return services.BuildServiceProvider();
     }
