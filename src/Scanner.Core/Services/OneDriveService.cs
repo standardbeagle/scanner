@@ -13,7 +13,7 @@ namespace Scanner.Core.Services;
 /// </summary>
 public class OneDriveService : ICloudStorageService
 {
-    private const string ClientId = "aa81ea9c-c090-423c-ba1a-7d5d33131a35";
+    private const string ClientId = "REPLACE_WITH_ONEDRIVE_CLIENT_ID";
     private static readonly string[] Scopes = ["Files.ReadWrite", "offline_access"];
     private static readonly string GraphBase = "https://graph.microsoft.com/v1.0";
     private static readonly string TokenCachePath = Path.Combine(

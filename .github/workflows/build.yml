@@ -30,12 +30,18 @@ jobs:
         env:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          ONEDRIVE_CLIENT_ID: ${{ secrets.ONEDRIVE_CLIENT_ID }}
         run: |
-          $file = "src/Scanner.Core/Services/GoogleDriveService.cs"
-          (Get-Content $file) `
+          $gFile = "src/Scanner.Core/Services/GoogleDriveService.cs"
+          (Get-Content $gFile) `
             -replace 'REPLACE_WITH_GOOGLE_CLIENT_ID', $env:GOOGLE_CLIENT_ID `
             -replace 'REPLACE_WITH_GOOGLE_CLIENT_SECRET', $env:GOOGLE_CLIENT_SECRET |
-          Set-Content $file
+          Set-Content $gFile
+
+          $odFile = "src/Scanner.Core/Services/OneDriveService.cs"
+          (Get-Content $odFile) `
+            -replace 'REPLACE_WITH_ONEDRIVE_CLIENT_ID', $env:ONEDRIVE_CLIENT_ID |
+          Set-Content $odFile
 
       - name: Publish x64
         run: |
