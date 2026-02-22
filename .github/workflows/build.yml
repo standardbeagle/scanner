@@ -25,6 +25,18 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore Scanner.sln -p:Platform=x64
 
+      - name: Inject OAuth credentials
+        shell: pwsh
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        run: |
+          $file = "src/Scanner.Core/Services/GoogleDriveService.cs"
+          (Get-Content $file) `
+            -replace 'REPLACE_WITH_GOOGLE_CLIENT_ID', $env:GOOGLE_CLIENT_ID `
+            -replace 'REPLACE_WITH_GOOGLE_CLIENT_SECRET', $env:GOOGLE_CLIENT_SECRET |
+          Set-Content $file
+
       - name: Publish x64
         run: |
           dotnet publish src/Scanner.App/Scanner.App.csproj `
